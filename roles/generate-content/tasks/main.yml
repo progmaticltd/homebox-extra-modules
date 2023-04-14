@@ -1,0 +1,9 @@
+---
+
+- name: Install the required packages
+  include_tasks: packages.yml
+  tags: apt
+
+- name: Deploy the scripts
+  include_tasks: scripts.yml
+  tags: scripts

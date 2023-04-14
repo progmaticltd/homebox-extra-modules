@@ -1,0 +1,8 @@
+---
+
+- name: Deploy the script to generate emails
+  copy:
+    src: generate-emails.pl
+    dest: /usr/local/sbin/generate-emails
+    mode: 0755
+  tags: scripts

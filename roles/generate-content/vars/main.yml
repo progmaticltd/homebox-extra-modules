@@ -1,0 +1,10 @@
+---
+
+packages:
+  - libdata-random-perl
+  - libdatetime-format-mail-perl
+  - libdatetime-format-strptime-perl
+  - libfile-slurp-perl
+  - libmime-lite-perl
+  - libpdf-create-perl
+  - libtext-greeking-perl

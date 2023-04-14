@@ -1,0 +1,8 @@
+---
+
+# The dictionary to work with
+lang_packages:
+  - wamerican
+  - wbritish
+  - wfrench
+  - wspansih
