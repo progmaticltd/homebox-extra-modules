@@ -1,0 +1,8 @@
+---
+
+- name: Install the required packages
+  apt:
+    name: '{{ packages }}'
+    state: absent
+    purge: true
+    autoremove: true

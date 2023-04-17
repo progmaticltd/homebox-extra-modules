@@ -1,10 +1,27 @@
 ---
 
 packages:
+  - libdata-dump-perl
   - libdata-random-perl
   - libdatetime-format-mail-perl
   - libdatetime-format-strptime-perl
+  - libfile-listing-perl
   - libfile-slurp-perl
+  - libfont-afm-perl
+  - libhtml-form-perl
+  - libhtml-format-perl
+  - libhtml-parser-perl
+  - libhtml-tagset-perl
+  - libhtml-tree-perl
+  - libhttp-cookies-perl
+  - libhttp-daemon-perl
+  - libhttp-negotiate-perl
+  - liblwp-protocol-https-perl
   - libmime-lite-perl
+  - libnet-http-perl
   - libpdf-create-perl
   - libtext-greeking-perl
+  - libwww-perl
+  - libwww-robotrules-perl
+  - libweb-scraper-perl
+  - liburi-encode-perl

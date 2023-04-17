@@ -15,24 +15,37 @@ use MIME::Lite;
 use Data::Random qw(:all);
 use DateTime::Format::Mail;
 use Getopt::Long;
-use File::Temp qw(tempfile);
+use Pod::Usage;
 use DateTime::Format::Strptime;
-
+use LWP::UserAgent;
+use HTTP::Request;
+use HTTP::Tiny;
+use Data::Dumper;
+use URI::Encode qw(uri_encode uri_decode);
+use Time::Local;
 
 # Load the parameters
 my $lang;
 my $recipient;
-my $from;
+my $from = 'postmaster';
 my $month;
 my $year;
+my $attach = 'text';
+my $wikipedia_domain = "en.wikipedia.org";
+my $body = 'text';
 
 GetOptions (
+    "body=s"      => \$body,
     "lang=s"      => \$lang,
     "month=s"     => \$month,
     "year=s"      => \$year,
     "recipient=s" => \$recipient,
-    "from=s"      => \$from)
-    or die("Error in command line arguments\n");
+    "attach=s"    => \$attach,
+    "from=s"      => \$from,
+    "wiki=s"      => \$wikipedia_domain
+    ) or die("Error in command line arguments\n");
+
+# TODO: Check the parameters
 
 # Load the dictionary
 my $file = "/usr/share/dict/$lang";
@@ -49,28 +62,20 @@ $generator->words(6,12);
 
 my $subject = $generator->generate;
 
-# Create the message body
-$generator->paragraphs(3,9);
-$generator->sentences(3,9);
-$generator->words(10,22);
+# Create the date time range of the message
+my $last_day;
+if ( $month < 11 ) {
+    my $last_day_epoch = timelocal(0, 0, 0, 1, $month + 1, $year) - 86400;
+    $last_day = (localtime $last_day_epoch)[3];
+} else {
+    my $last_day_epoch = timelocal(0, 0, 0, 1, 0, $year + 1) - 86400;
+    $last_day = (localtime $last_day_epoch)[3];
+}
 
-my $body = $generator->generate;
+my $min_date = sprintf("%04d-%02d-01 00:00:00", $year, $month);
+my $max_date = sprintf("%04d-%02d-%02d 23:59:59", $year, $month, $last_day);
 
-# Create a text attachment
-$generator->paragraphs(10, 30);
-$generator->sentences(6,18);
-$generator->words(7,17);
-
-my $attach_file = new File::Temp(UNLINK => 1);
-$attach_file->print($generator->generate);
-$attach_file->flush;
-
-# Generate an attachment name
-my $attach_name = rand_chars(set => 'alphanumeric', min => 6, max => 14);
-
-# Datetime of the message
-my $datetime = rand_datetime(min => '2000-01-01', max => 'now' );
-print $datetime;
+my $datetime = rand_datetime(min => $min_date, max => $max_date);
 
 my $strp = DateTime::Format::Strptime->new(
     pattern   => '%Y-%m-%d %H:%M:%S',
@@ -79,7 +84,7 @@ my $strp = DateTime::Format::Strptime->new(
     );
 my $dt = $strp->parse_datetime($datetime);
 
-# Prepare the message, and send the message
+# Prepare the first part of the message
 my $msg = MIME::Lite->new(
     From     => $from,
     To       => $recipient,
@@ -88,19 +93,106 @@ my $msg = MIME::Lite->new(
     Type     => 'multipart/mixed'
     );
 
-$msg->attach (
-    Type => 'text/plain; charset=UTF-8',
-    Data => $body,
-    ) or die "Error adding the body message part: $!";
+if ( $body eq 'html' ) {
 
-$msg->attach(
-    Type => 'text/plain; charset=UTF-8',
-    Path => $attach_file,
-    Filename => "${attach_name}.txt",
-    Disposition => 'attachment'
-    ) or die "Error adding the text message part: $!";
+    # Create the message body
+    my $nbp = 3 + int(rand(5));
+    my $body = "" ;
 
+    for ( my $p = 0 ; $p < $nbp ; $p++ ) {
+        $generator->paragraphs(1,1);
+        $generator->sentences(3,9);
+        $generator->words(10,22);
+        $body .= "<p>" . $generator->generate . "</p>";
+    }
+
+    # Add the root message
+    $msg->attach (
+        Type => 'text/html; charset=UTF-8',
+        Data => "<html><h1>$subject</h1><body>$body</body></html>",
+        ) or die "Error adding the body message part: $!";
+
+} elsif ( $body eq 'text') {
+
+    # Create the message body
+    $generator->paragraphs(3,9);
+    $generator->sentences(3,9);
+    $generator->words(10,22);
+
+    my $body = $generator->generate;
+
+    # Add the root message
+    $msg->attach (
+        Type => 'text/plain; charset=UTF-8',
+        Data => $body,
+        ) or die "Error adding the body message part: $!";
+
+}
+
+if ( $attach eq 'pdf' ) {
+
+    # Get the url of a random wikipedia page
+    my $res = HTTP::Tiny->new->head("https://$wikipedia_domain/wiki/Special:Random");
+
+    # Get the url and create the attachment name
+    my $page_title = $res->{url};
+    $page_title =~ s:.*/::g;
+    my $attach_name = uri_decode($page_title);
+
+    $res = HTTP::Tiny->new->get("https://$wikipedia_domain/api/rest_v1/page/pdf/$page_title");
+
+    # Attach the pdf file
+    $msg->attach (
+        Type => 'application/pdf',
+        Data => $res->{content},
+        Filename => "$attach_name.pdf",
+        Disposition => 'attachment'
+        ) or die "Error adding the body message part: $!";
+
+} elsif ( $attach eq 'text' ) {
+
+    # Create a text attachment
+    $generator->paragraphs(10, 30);
+    $generator->sentences(6,18);
+    $generator->words(7,17);
+
+    # Generate an attachment name
+    my $attach_name = rand_chars(set => 'alphanumeric', min => 6, max => 14);
+
+    $msg->attach(
+        Type => 'text/plain; charset=UTF-8',
+        Data => $generator->generate,
+        Filename => "${attach_name}.txt",
+        Disposition => 'attachment'
+        ) or die "Error adding the text message part: $!";
+
+}
+
+# Send the email
 $msg->send;
 
-# Release the attachment file
-close $attach_file;
+
+__END__
+
+=head1 NAME
+
+generate-emails - Generate and send random emails
+
+=head1 SYNOPSIS
+
+generate-emails [options]
+
+=head1 OPTIONS
+
+ Options:
+   --help            brief help message
+   --man             full documentation
+   --lang            name of the language file to use in /usr/share/dict
+   --year            the year to use to generate the email date
+   --month           the month to use to generate the email date
+   --recipient       the locall recipient email address
+   --attach          type of attachment to use: text (default), html, or pdf
+   --from            the from email address to use
+   --wiki            the url of wikipedia to use when generating pdf attachments
+
+=cut

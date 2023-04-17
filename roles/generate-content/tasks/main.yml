@@ -4,6 +4,10 @@
   include_tasks: packages.yml
   tags: apt
 
+- name: Configure the proxy
+  include_tasks: proxy.yml
+  tags: proxy
+
 - name: Deploy the scripts
   include_tasks: scripts.yml
   tags: scripts

@@ -1,3 +1,14 @@
 ---
 
 # Tasks to run when uninstalling the role
+- name: Install the required packages
+  include_tasks: uninstall/packages.yml
+  tags: apt
+
+- name: Configure the proxy
+  include_tasks: uninstall/proxy.yml
+  tags: proxy
+
+- name: Deploy the scripts
+  include_tasks: uninstall/scripts.yml
+  tags: scripts

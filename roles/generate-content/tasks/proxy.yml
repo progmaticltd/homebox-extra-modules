@@ -1,0 +1,6 @@
+---
+
+- name: Allow wikipedia access
+  lineinfile:
+    path: /etc/tinyproxy/filter
+    line: .wikipedia.org

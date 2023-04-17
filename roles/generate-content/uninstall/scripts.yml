@@ -1,0 +1,7 @@
+---
+
+- name: Remove the script to generate emails
+  file:
+    path: /usr/local/sbin/generate-emails
+    state: absent
+  tags: scripts
