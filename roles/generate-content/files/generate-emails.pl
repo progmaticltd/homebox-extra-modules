@@ -97,19 +97,27 @@ if ( $body eq 'html' ) {
 
     # Create the message body
     my $nbp = 3 + int(rand(5));
-    my $body = "" ;
+    my $html_body = "" ;
+    my $text_body = "" ;
 
     for ( my $p = 0 ; $p < $nbp ; $p++ ) {
         $generator->paragraphs(1,1);
         $generator->sentences(3,9);
         $generator->words(10,22);
-        $body .= "<p>" . $generator->generate . "</p>";
+        my $paragraph .= $generator->generate;
+        $html_body .= "<p>" . $paragraph . "</p>";
+        $text_body .= $paragraph;
     }
 
-    # Add the root message
+    # Add the html and the text part
     $msg->attach (
         Type => 'text/html; charset=UTF-8',
-        Data => "<html><h1>$subject</h1><body>$body</body></html>",
+        Data => "<html><h1>$subject</h1><body>$html_body</body></html>",
+        ) or die "Error adding the body message part: $!";
+
+    $msg->attach (
+        Type => 'text/plain; charset=UTF-8',
+        Data => "$subject\n\n$text_body",
         ) or die "Error adding the body message part: $!";
 
 } elsif ( $body eq 'text') {
