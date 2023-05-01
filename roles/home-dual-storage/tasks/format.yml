@@ -1,0 +1,43 @@
+---
+
+- name: Create the first partition for live emails storage
+  parted:
+    device: '{{ storage.device }}'
+    part_start: '0%'
+    part_end: '20%'
+    name: users
+    number: 1
+    label: gpt
+    state: present
+
+- name: Format the first partition
+  filesystem:
+    device: '{{ storage.device }}1'
+    fstype: '{{ storage.live.fstype }}'
+    opts: '{{ storage.live.mkfs_opts | join(" ") }}'
+
+- name: Create the target directory if not already existing
+  file:
+    path: /home/users
+    state: directory
+
+- name: Create the second partition for archive emails storage
+  parted:
+    device: '{{ storage.device }}'
+    part_start: '20%'
+    part_end: '100%'
+    name: archives
+    number: 2
+    label: gpt
+    state: present
+
+- name: Format the second partition
+  filesystem:
+    device: '{{ storage.device }}2'
+    fstype: '{{ storage.archives.fstype }}'
+    opts: '{{ storage.archives.mkfs_opts | join(" ") }}'
+
+- name: Create the target directory if not already existing
+  file:
+    path: /home/archives
+    state: directory

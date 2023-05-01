@@ -1,0 +1,10 @@
+---
+
+- name: Mount the filesystem
+  meta: flush_handlers
+
+- name: Ensure quotas are used on the users partition
+  shell: btrfs quota enable /home/users
+
+- name: Ensure quotas are used on the archives partition
+  shell: btrfs quota enable /home/archives
