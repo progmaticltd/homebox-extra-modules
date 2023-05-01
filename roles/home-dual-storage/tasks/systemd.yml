@@ -1,0 +1,17 @@
+---
+
+- name: Copy the systemd mount file for users partition
+  notify:
+    - Reload systemd
+    - Mount home-users
+  template:
+    src: home-users.mount
+    dest: /etc/systemd/system/home-users.mount
+
+- name: Copy the systemd mount file for archives partition
+  notify:
+    - Reload systemd
+    - Mount home-archives
+  template:
+    src: home-archives.mount
+    dest: /etc/systemd/system/home-archives.mount

@@ -1,0 +1,11 @@
+[Unit]
+Description=Users’ live storage
+
+[Mount]
+What={{ storage.device }}1
+Where=/home/users
+Type={{ storage.live.fstype }}
+Options={{ storage.live.mount_opts | join(",") }}
+
+[Install]
+WantedBy=multi-user.target

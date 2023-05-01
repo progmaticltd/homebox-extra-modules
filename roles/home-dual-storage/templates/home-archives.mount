@@ -1,0 +1,11 @@
+[Unit]
+Description=Users’ archive storage
+
+[Mount]
+What={{ storage.device }}2
+Where=/home/archives
+Type={{ storage.archives.fstype }}
+Options={{ storage.archives.mount_opts | join(",") }}
+
+[Install]
+WantedBy=multi-user.target

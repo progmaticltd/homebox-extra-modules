@@ -1,0 +1,9 @@
+---
+
+- name: Install the filesystem management packages
+  when: >-
+    storage.live.fstype == 'btrfs' or
+    storage.archives.fstype == 'btrfs'
+  apt:
+    name: btrfs-progs
+    state: present
