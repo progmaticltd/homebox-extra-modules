@@ -19,16 +19,16 @@ archives. This can be used both for a home physical server or a virtual cloud se
 #### home-live-storage
 
 This role allows to store live emails (`/home/users`) on a separate dedicated disk.
-See the [dedicated documentation](../../roles/home-live-storage/doc/readme.md) in the role, for more details.
+See the [dedicated documentation](roles/home-live-storage/doc/readme.md) in the role, for more details.
 
 #### home-archives-storage
 
 This role allows to store archive emails (`/home/archives`) on a separate dedicated disk.
-See the [dedicated documentation](../../roles/home-archives-storage/doc/readme.md) in the role, for more details.
+See the [dedicated documentation](roles/home-archives-storage/doc/readme.md) in the role, for more details.
 
 
 #### home-dual-storage
 
 This role allows to store _both_ live (`/home/users`) and archive emails (`/home/archives`) on a separate dedicated
 disk.
-See the [dedicated documentation](../../roles/home-dual-storage/doc/readme.md) in the role, for more details.
+See the [dedicated documentation](roles/home-dual-storage/doc/readme.md) in the role, for more details.
