@@ -1,13 +1,13 @@
 ---
 
 - name: Install the required packages
-  include_tasks: packages.yml
+  include_tasks: install/packages.yml
 
 - name: Format the storage
-  include_tasks: format.yml
+  include_tasks: install/format.yml
 
 - name: Create and start the systemd storage
-  include_tasks: systemd.yml
+  include_tasks: install/systemd.yml
 
 - name: Initialise the file systems
-  include_tasks: init.yml
+  include_tasks: install/init.yml
