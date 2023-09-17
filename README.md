@@ -8,6 +8,12 @@ To use these roles, make sure the path, relative or absolute, is included in the
 roles_path = .:{{ playbook_dir }}/../../common/roles/:/home/andre/git/homebox-extra-modules
 ```
 
+You can then run the role(s) using the dynamic role selection syntax, for instance:
+
+```sh
+ROLE=home-dual-storage ansible-playbook -v -l install.yml
+```
+
 ## Current roles
 
 ### Separate home storage roles
