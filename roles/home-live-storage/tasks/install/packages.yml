@@ -1,5 +1,10 @@
 ---
 
+- name: Install the parted utility
+  apt:
+    name: parted
+    state: present
+
 - name: Install the filesystem management packages
   when: storage_live.fstype == 'btrfs'
   apt:

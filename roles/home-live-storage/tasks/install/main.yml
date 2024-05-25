@@ -1,5 +1,8 @@
 ---
 
+- name: Load the facts
+  include_tasks: install/facts.yml
+
 - name: Install the required packages
   include_tasks: install/packages.yml
 

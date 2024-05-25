@@ -7,11 +7,15 @@
     label: gpt
     state: present
 
+- name: Use the fs label from the command line
+  set_fact:
+    label_opt: '-L {{ fs_label }}'
+
 - name: Format the partition
   filesystem:
     device: '{{ storage_live.device }}1'
     fstype: '{{ storage_live.fstype }}'
-    opts: '{{ storage_live.mkfs_opts | join(" ") }}'
+    opts: '{{ (storage_live.mkfs_opts + [ label_opt ]) | join(" ") }}'
 
 - name: Create the target directory if not already existing
   file:
