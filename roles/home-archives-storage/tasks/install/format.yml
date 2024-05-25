@@ -1,19 +1,23 @@
 ---
 
 - name: Create the first partition
-  parted:
+  community.general.parted:
     device: '{{ storage_archive.device }}'
     number: 1
     label: gpt
     state: present
 
+- name: Use the fs label from the command line
+  set_fact:
+    label_opt: '-L {{ fs_label }}'
+
 - name: Format the partition
-  filesystem:
+  community.general.filesystem:
     device: '{{ storage_archive.device }}1'
     fstype: '{{ storage_archive.fstype }}'
-    opts: '{{ storage_archive.mkfs_opts | join(" ") }}'
+    opts: '{{ (storage_archive.mkfs_opts + [ label_opt ]) | join(" ") }}'
 
 - name: Create the target directory if not already existing
-  file:
+  ansible.builtin.file:
     path: /home/archives
     state: directory
